@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.payloads.ApiResponse;
 import com.example.demo.payloads.UserDto;
 import com.example.demo.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto user) {
         return new ResponseEntity<>(this.userService.createUser(user), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto user) {
         return new ResponseEntity<>(this.userService.updateUser(user), HttpStatus.OK);
     }
 
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse> deleteUser(@RequestBody UserDto user) {
+    public ResponseEntity<ApiResponse> deleteUser(@Valid @RequestBody UserDto user) {
         this.userService.deleteUser(user);
         return new ResponseEntity<>(new ApiResponse("User Deleted Successfully", true), HttpStatus.OK);
     }
