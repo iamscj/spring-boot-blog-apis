@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.entities.Post;
 import com.example.demo.payloads.ApiResponse;
+import com.example.demo.payloads.PaginatedPosts;
 import com.example.demo.payloads.PostDto;
 import com.example.demo.services.PostService;
 import jakarta.validation.Valid;
@@ -39,8 +40,11 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostDto>> getAllPosts() {
-        return new ResponseEntity<>(this.postService.getAllPosts(), HttpStatus.OK);
+    public ResponseEntity<PaginatedPosts> getAllPosts(
+            @RequestParam(value = "pageNumber", defaultValue = "0", required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize
+    ) {
+        return new ResponseEntity<>(this.postService.getAllPosts(pageNumber, pageSize), HttpStatus.OK);
     }
 
     @GetMapping("/{postId}")
@@ -49,17 +53,25 @@ public class PostController {
     }
 
     @GetMapping("/getByUser")
-    public ResponseEntity<List<PostDto>> getPostsByUserId(@RequestParam Integer userId) {
+    public ResponseEntity<PaginatedPosts> getPostsByUserId(
+            @RequestParam Integer userId,
+            @RequestParam(value = "pageNumber", defaultValue = "0", required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize
+    ) {
         return new ResponseEntity<>(
-          this.postService.getPostsByUser(userId),
+          this.postService.getPostsByUser(userId, pageNumber, pageSize),
           HttpStatus.OK
         );
     }
 
     @GetMapping("/getByCategory")
-    public ResponseEntity<List<PostDto>> getPostsByCategoryId(@RequestParam Integer categoryId) {
+    public ResponseEntity<PaginatedPosts> getPostsByCategoryId(
+            @RequestParam Integer categoryId,
+            @RequestParam(value = "pageNumber", defaultValue = "0", required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) Integer pageSize
+    ) {
         return new ResponseEntity<>(
-                this.postService.getPostsByCategory(categoryId),
+                this.postService.getPostsByCategory(categoryId, pageNumber, pageSize),
                 HttpStatus.OK
         );
     }

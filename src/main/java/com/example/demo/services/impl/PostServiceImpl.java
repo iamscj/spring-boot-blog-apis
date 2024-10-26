@@ -4,6 +4,8 @@ import com.example.demo.entities.Category;
 import com.example.demo.entities.Post;
 import com.example.demo.entities.User;
 import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.payloads.PaginatedPosts;
+import com.example.demo.payloads.PaginationInfo;
 import com.example.demo.payloads.PostDto;
 import com.example.demo.repositories.CategoryRepo;
 import com.example.demo.repositories.PostRepo;
@@ -11,11 +13,13 @@ import com.example.demo.repositories.UserRepo;
 import com.example.demo.services.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -78,12 +82,29 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        return this.postRepo
-                .findAll()
+    public PaginatedPosts getAllPosts(Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        Page<Post> posts = this.postRepo.findAll(pageable);
+
+        List<PostDto> postDtos = posts
                 .stream()
                 .map(this::postToDto)
-                .collect(Collectors.toList());
+                .toList();
+
+        PaginatedPosts paginatedPosts = new PaginatedPosts();
+        PaginationInfo paginationInfo = new PaginationInfo(
+                posts.getNumber(),
+                posts.getSize(),
+                posts.getTotalElements(),
+                posts.getTotalPages(),
+                posts.isLast()
+        );
+
+        paginatedPosts.setContent(postDtos);
+        paginatedPosts.setPaginationInfo(paginationInfo);
+
+        return paginatedPosts;
     }
 
     @Override
@@ -96,29 +117,63 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getPostsByUser(Integer userId) {
+    public PaginatedPosts getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize) {
         User user = this.userRepo
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        return this.postRepo
-                .findByUser(user)
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        Page<Post> posts = this.postRepo.findByUser(user, pageable);
+
+        List<PostDto> postDtos = posts
                 .stream()
                 .map(this::postToDto)
-                .collect(Collectors.toList());
+                .toList();
+
+        PaginatedPosts paginatedPosts = new PaginatedPosts();
+        PaginationInfo paginationInfo = new PaginationInfo(
+                posts.getNumber(),
+                posts.getSize(),
+                posts.getTotalElements(),
+                posts.getTotalPages(),
+                posts.isLast()
+        );
+
+        paginatedPosts.setContent(postDtos);
+        paginatedPosts.setPaginationInfo(paginationInfo);
+
+        return paginatedPosts;
     }
 
     @Override
-    public List<PostDto> getPostsByCategory(Integer categoryId) {
+    public PaginatedPosts getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize) {
         Category category = this.categoryRepo
                 .findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
-        return this.postRepo
-                .findByCategory(category)
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        Page<Post> posts = this.postRepo.findByCategory(category, pageable);
+
+        List<PostDto> postDtos = posts
                 .stream()
                 .map(this::postToDto)
-                .collect(Collectors.toList());
+                .toList();
+
+        PaginatedPosts paginatedPosts = new PaginatedPosts();
+        PaginationInfo paginationInfo = new PaginationInfo(
+                posts.getNumber(),
+                posts.getSize(),
+                posts.getTotalElements(),
+                posts.getTotalPages(),
+                posts.isLast()
+        );
+
+        paginatedPosts.setContent(postDtos);
+        paginatedPosts.setPaginationInfo(paginationInfo);
+
+        return paginatedPosts;
     }
 
     @Override

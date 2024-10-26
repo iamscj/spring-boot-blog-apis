@@ -1,8 +1,6 @@
 package com.example.demo.services;
 
-import com.example.demo.entities.Category;
-import com.example.demo.entities.Post;
-import com.example.demo.entities.User;
+import com.example.demo.payloads.PaginatedPosts;
 import com.example.demo.payloads.PostDto;
 
 import java.util.List;
@@ -15,13 +13,13 @@ public interface PostService {
 
     void deletePost(Integer postId);
 
-    List<PostDto> getAllPosts();
+    PaginatedPosts getAllPosts(Integer PageNumber, Integer PageSize);
 
     PostDto getPostById(Integer postId);
 
-    List<PostDto> getPostsByUser(Integer userId);
+    PaginatedPosts getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize);
 
-    List<PostDto> getPostsByCategory(Integer categoryId);
+    PaginatedPosts getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize);
 
     List<PostDto> searchPostsByTitle(String keyword);
 }
