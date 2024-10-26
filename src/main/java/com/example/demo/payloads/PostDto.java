@@ -14,6 +14,9 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class PostDto {
+
+    private Integer postId;
+
     @NotEmpty
     @Size(min = 6, max = 20, message = "PostTitle must be minimum of 6 characters and maximum of 30 characters")
     private String title;
