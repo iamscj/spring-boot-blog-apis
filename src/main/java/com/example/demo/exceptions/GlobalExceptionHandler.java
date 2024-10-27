@@ -36,4 +36,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> dataIntegrityViolationExceptionHandler(DataIntegrityViolationException e) {
         return new ResponseEntity<>(new ApiResponse(e.getMessage(), false), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(FileFormatException.class)
+    public ResponseEntity<ApiResponse> fileFormatExceptionHandler(FileFormatException e) {
+        return new ResponseEntity<>(new ApiResponse(e.getMessage(), false), HttpStatus.BAD_REQUEST);
+    }
 }
