@@ -92,24 +92,7 @@ public class PostServiceImpl implements PostService {
 
         Page<Post> posts = this.postRepo.findAll(pageable);
 
-        List<PostDto> postDtos = posts
-                .stream()
-                .map(this::postToDto)
-                .toList();
-
-        PaginatedPosts paginatedPosts = new PaginatedPosts();
-        PaginationInfo paginationInfo = new PaginationInfo(
-                posts.getNumber(),
-                posts.getSize(),
-                posts.getTotalElements(),
-                posts.getTotalPages(),
-                posts.isLast()
-        );
-
-        paginatedPosts.setContent(postDtos);
-        paginatedPosts.setPaginationInfo(paginationInfo);
-
-        return paginatedPosts;
+        return this.getPaginatedPosts(posts);
     }
 
     @Override
@@ -122,68 +105,56 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PaginatedPosts getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize) {
+    public PaginatedPosts getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
         User user = this.userRepo
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(
+                pageNumber,
+                pageSize,
+                sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()
+        );
 
         Page<Post> posts = this.postRepo.findByUser(user, pageable);
 
-        List<PostDto> postDtos = posts
-                .stream()
-                .map(this::postToDto)
-                .toList();
-
-        PaginatedPosts paginatedPosts = new PaginatedPosts();
-        PaginationInfo paginationInfo = new PaginationInfo(
-                posts.getNumber(),
-                posts.getSize(),
-                posts.getTotalElements(),
-                posts.getTotalPages(),
-                posts.isLast()
-        );
-
-        paginatedPosts.setContent(postDtos);
-        paginatedPosts.setPaginationInfo(paginationInfo);
-
-        return paginatedPosts;
+        return this.getPaginatedPosts(posts);
     }
 
     @Override
-    public PaginatedPosts getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize) {
+    public PaginatedPosts getPostsByCategory(
+            Integer categoryId,
+            Integer pageNumber,
+            Integer pageSize,
+            String sortBy,
+            String sortDir
+    ) {
         Category category = this.categoryRepo
                 .findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(
+                pageNumber,
+                pageSize,
+                sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()
+        );
 
         Page<Post> posts = this.postRepo.findByCategory(category, pageable);
 
-        List<PostDto> postDtos = posts
-                .stream()
-                .map(this::postToDto)
-                .toList();
-
-        PaginatedPosts paginatedPosts = new PaginatedPosts();
-        PaginationInfo paginationInfo = new PaginationInfo(
-                posts.getNumber(),
-                posts.getSize(),
-                posts.getTotalElements(),
-                posts.getTotalPages(),
-                posts.isLast()
-        );
-
-        paginatedPosts.setContent(postDtos);
-        paginatedPosts.setPaginationInfo(paginationInfo);
-
-        return paginatedPosts;
+        return this.getPaginatedPosts(posts);
     }
 
     @Override
-    public List<PostDto> searchPostsByTitle(String keyword) {
-        return List.of();
+    public PaginatedPosts searchPosts(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+        Pageable pageable = PageRequest.of(
+                pageNumber,
+                pageSize,
+                sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending()
+        );
+
+        Page<Post> posts = this.postRepo.findByTitleContaining(keyword, pageable);
+
+        return this.getPaginatedPosts(posts);
     }
 
     public Post dtoToPost(PostDto postDto) {
@@ -192,5 +163,26 @@ public class PostServiceImpl implements PostService {
 
     public PostDto postToDto(Post post) {
         return this.modelMapper.map(post, PostDto.class);
+    }
+
+    public PaginatedPosts getPaginatedPosts(Page<Post> posts) {
+        List<PostDto> postDtos = posts
+                .stream()
+                .map(this::postToDto)
+                .toList();
+
+        PaginatedPosts paginatedPosts = new PaginatedPosts();
+        PaginationInfo paginationInfo = new PaginationInfo(
+                posts.getNumber(),
+                posts.getSize(),
+                posts.getTotalElements(),
+                posts.getTotalPages(),
+                posts.isLast()
+        );
+
+        paginatedPosts.setContent(postDtos);
+        paginatedPosts.setPaginationInfo(paginationInfo);
+
+        return paginatedPosts;
     }
 }

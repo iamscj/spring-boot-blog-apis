@@ -3,8 +3,6 @@ package com.example.demo.services;
 import com.example.demo.payloads.PaginatedPosts;
 import com.example.demo.payloads.PostDto;
 
-import java.util.List;
-
 public interface PostService {
 
     PostDto createPost(PostDto post, Integer userId, Integer categoryId);
@@ -17,9 +15,9 @@ public interface PostService {
 
     PostDto getPostById(Integer postId);
 
-    PaginatedPosts getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize);
+    PaginatedPosts getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
-    PaginatedPosts getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize);
+    PaginatedPosts getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
-    List<PostDto> searchPostsByTitle(String keyword);
+    PaginatedPosts searchPosts(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 }
